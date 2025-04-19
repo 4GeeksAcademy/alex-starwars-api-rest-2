@@ -54,8 +54,14 @@ def handle_people():
         return 'There is no character here, add one and try again!'
     
 @app.route('/people/<int:people_id>', methods=['GET'])
-def handle_specific_people():
-    return 'specific people'
+def handle_specific_people(people_id):
+    people = db.session.query(Character).all()
+    people_list = [character.serialize() for character in people]
+    def get_char(char):
+        if char.id == people_id:
+            return char.serialize() 
+    specific_char = filter(get_char, people_list)
+    return specific_char
 
 @app.route('/planets', methods=['GET'])
 def handle_planets():
