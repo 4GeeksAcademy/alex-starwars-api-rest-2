@@ -51,23 +51,23 @@ def handle_people():
         characters_list = [char.serialize() for char in characters]
         return jsonify(characters_list), 200
     else:
-        return 'There is no character here, add one and try again!'
+        return 'There is no character here, add one and try again!', 404
     
 @app.route('/people/<int:people_id>', methods=['GET'])
 def handle_specific_people(people_id):
     character = db.session.query(Character).filter_by(id=people_id).first()
     if character:
         character = character.serialize()
-        return jsonify(character)
+        return jsonify(character), 200
     else:
-        return "there is no character with this id"
+        return "there is no character with this id", 404
 
 @app.route('/planets', methods=['GET'])
 def handle_planets():
     planets = db.session.query(Planet).all()
     if planets:
         planets_list = [planet.serialize() for planet in planets]
-        return jsonify(planets_list)
+        return jsonify(planets_list), 200
     else:
         return ' There is no planet here, add one and try again'
 
@@ -75,9 +75,40 @@ def handle_planets():
 def handle_specific_planet(planet_id):
     planet= db.session.query(Planet).filter_by(id=planet_id).first()
     if planet:
-        return jsonify(planet.serialize())
+        return jsonify(planet.serialize()), 200
     else:
-        return 'There is no planet with that id, try again'
+        return 'There is no planet with that id, try again', 404
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def handle_favorite_planet(planet_id):
+    data = request.get_json()
+    user_id_from_body = data.get("user_id")
+
+    user_from_database = db.session.query(User).filter_by(id=user_id_from_body).first()
+    planet_from_database = db.session.query(Planet).filter_by(id=planet_id).first()
+    new_favorite = Favorite(user_id = user_from_database.id, planet_id= planet_from_database.id, character_id=1)
+
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return "Favorite added successfully", 201
+
+@app.route('/favorite/people/<int:people_id>', methods=['POST'])
+def handle_favorite_people(people_id):
+    data = request.get_json()
+    user_id_from_body = data.get("user_id")
+
+    user_from_database = db.session.query(User).filter_by(id=user_id_from_body).first()
+    people_from_database = db.session.query(Character).filter_by(id=people_id).first()
+    new_favorite = Favorite(user_id = user_from_database.id, planet_id= 1, character_id=people_from_database.id)
+
+    db.session.add(new_favorite)
+    db.session.commit()
+    
+    return f"Favorite added successfully", 201
+    # favorites = db.session.query(Favorite).all()
+    # favorites_list = [fav.serialize() for fav in favorites]
+    # return favorites_list, 201
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
