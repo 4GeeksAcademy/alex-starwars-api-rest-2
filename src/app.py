@@ -55,13 +55,11 @@ def handle_people():
     
 @app.route('/people/<int:people_id>', methods=['GET'])
 def handle_specific_people(people_id):
-    people = db.session.query(Character).all()
-    people_list = [character.serialize() for character in people]
-    def get_char(char):
-        if char.id == people_id:
-            return char.serialize() 
-    specific_char = filter(get_char, people_list)
-    return specific_char
+    character = db.session.query(Character).filter_by(id=people_id).first()
+    if character:
+        return jsonify(character.serialize())
+    else:
+        return "there is no character with this id"
 
 @app.route('/planets', methods=['GET'])
 def handle_planets():
