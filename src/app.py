@@ -93,6 +93,15 @@ def handle_favorite_planet(planet_id):
 
     return "Favorite added successfully", 201
 
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
+def handle_delete_favorite_planet(planet_id):
+    favorite_to_delete = db.session.query(Favorite).filter_by(planet_id = planet_id).first()
+
+    db.session.delete(favorite_to_delete)
+    db.session.commit()
+    
+    return "Favorite deleted successfully", 200
+
 @app.route('/favorite/people/<int:people_id>', methods=['POST'])
 def handle_favorite_people(people_id):
     data = request.get_json()
@@ -105,12 +114,24 @@ def handle_favorite_people(people_id):
     db.session.add(new_favorite)
     db.session.commit()
     
-    return f"Favorite added successfully", 201
+    return "Favorite added successfully", 201
     # favorites = db.session.query(Favorite).all()
     # favorites_list = [fav.serialize() for fav in favorites]
     # return favorites_list, 201
 
+@app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
+def handle_delete_favorite_people(people_id):
+    favorite_to_delete = db.session.query(Favorite).filter_by(character_id = people_id).first()
+
+    db.session.delete(favorite_to_delete)
+    db.session.commit()
+    
+    return "Favorite deleted successfully", 200
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)
+
+git add .
+git commit -m "add deletes"
+git push
