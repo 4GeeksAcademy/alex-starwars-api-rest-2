@@ -57,7 +57,8 @@ def handle_people():
 def handle_specific_people(people_id):
     character = db.session.query(Character).filter_by(id=people_id).first()
     if character:
-        return jsonify(character.serialize())
+        character = character.serialize()
+        return jsonify(character)
     else:
         return "there is no character with this id"
 
@@ -71,8 +72,12 @@ def handle_planets():
         return ' There is no planet here, add one and try again'
 
 @app.route('/planets/<int:planet_id>', methods=['GET'])
-def handle_specific_planet():
-    return 'specific planet'
+def handle_specific_planet(planet_id):
+    planet= db.session.query(Planet).filter_by(id=planet_id).first()
+    if planet:
+        return jsonify(planet.serialize())
+    else:
+        return 'There is no planet with that id, try again'
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
